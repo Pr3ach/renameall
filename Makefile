@@ -12,6 +12,9 @@ $(BIN): $(OBJ)
 %.o: %.c
 	$(CC) $< -o $@ -c $(FLAGS)
 
+install: all
+	cp -f $(BIN) /usr/bin
+
 clean:
 	rm -rf $(BIN) $(OBJ)
 
