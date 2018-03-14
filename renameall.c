@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
 	int file_count = 0;
 	char **l; /* l[nfile][len] */
 	char new_name[MAX_FILE_LENGTH] = {0};
-	char *p = NULL;
 
 	if (argc < 2 || strlen(argv[1]) > MAX_PATH)
 		usage(argv[0]);
@@ -40,22 +39,9 @@ int main(int argc, char *argv[])
 	for (i = 0; l[i][0]; i++)
 	{
 		w_bwhite("'%s': ", l[i]);
-		fgets(new_name, MAX_FILE_LENGTH-1, stdin);
 
-		/* if input is empty, don't rename, just skip */
-		if (new_name[0] == '\n')
+		if (get_newname(new_name) != 0)
 			continue;
-
-		/* remove new line */
-		if ((p = strchr(new_name, '\n')))
-		{
-			*p = '\0';
-		}
-		else
-		{
-			w_byellow("[-] Warning: new name may be too long\n");
-			purge_stdin();
-		}
 
 		if (_rename(l[i], new_name, argv[1]) != 0)
 		{
@@ -74,6 +60,36 @@ void usage(const char *self)
 	w_bwhite("Usage: %s <path>\n", self);
 
 	exit(0);
+}
+
+/*
+ * Get input
+ * Return non zero == skip
+ *
+ * */
+int get_newname(char *new_name)
+{
+	char *p = NULL;
+
+	fgets(new_name, MAX_FILE_LENGTH-1, stdin);
+
+	/* if input is empty, don't rename, just skip */
+	if (new_name[0] == '\n')
+		return -1;
+
+	/* remove new line */
+	if ((p = strchr(new_name, '\n')))
+	{
+		*p = '\0';
+	}
+	else
+	{
+		w_byellow("[-] Warning: new name too long; skipping\n");
+		purge_stdin();
+		return 1;
+	}
+
+	return 0;
 }
 
 /*

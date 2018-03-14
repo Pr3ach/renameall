@@ -23,6 +23,7 @@
 #define MAX_PATH 256
 
 void usage(const char *self);
+int get_newname(char *new_name);
 int comp(const void *p1, const void *p2);
 void _calloc(char ***l);
 void _free(char **l);
