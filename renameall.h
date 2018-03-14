@@ -19,11 +19,12 @@
 #define RENAMEALL_H
 
 #define MAX_FILES 1024
-#define MAX_FILE_LENGTH 64
+#define MAX_FILE_LENGTH 256
 #define MAX_PATH 256
 
 void usage(const char *self);
 int comp(const void *p1, const void *p2);
+void _calloc(char ***l);
 void _free(char **l);
 int _rename(const char *oldname, const char *newname, const char *prefix);
 void purge_stdin(void);
