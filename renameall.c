@@ -33,12 +33,8 @@ int main(int argc, char *argv[])
 	if (argc < 2 || strlen(argv[1]) > MAX_PATH)
 		usage(argv[0]);
 
-	l = (char **) calloc(MAX_FILES, sizeof(char *));
-	for (i = 0; i < MAX_FILES; i++)
-		l[i] = (char *) calloc(MAX_FILE_LENGTH, sizeof(char));
-
+	_calloc(&l);
 	file_count = list_dir((const char *) argv[1], l);
-
 	w_bgreen("[+] Found %d file%s\n", file_count, file_count > 1 ? "s\n" : "\n");
 
 	for (i = 0; l[i][0]; i++)
@@ -87,6 +83,15 @@ void usage(const char *self)
 int comp(const void *p1, const void *p2)
 {
 	return strcmp(*(char * const *)p1, *(char * const *)p2);
+}
+
+void _calloc(char ***l)
+{
+	int i = 0;
+
+	*l = (char **) calloc(MAX_FILES, sizeof(char *));
+	for (i = 0; i < MAX_FILES; i++)
+		(*l)[i] = calloc(MAX_FILE_LENGTH, sizeof(char));
 }
 
 void _free(char **l)
