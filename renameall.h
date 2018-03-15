@@ -22,6 +22,9 @@
 #define MAX_FILE_LENGTH 256
 #define MAX_PATH 256
 
+#define R_SUCCESS 0
+#define R_EXISTS 1
+
 void usage(const char *self);
 int get_newname(char *new_name);
 int comp(const void *p1, const void *p2);
@@ -30,6 +33,7 @@ void _free(char **l);
 int _rename(const char *oldname, const char *newname, const char *prefix);
 void purge_stdin(void);
 int list_dir(const char *path, char *l[]);
+char lower(char c);
 
 #endif
 

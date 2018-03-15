@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <dirent.h>
 #include <string.h>
 #include "renameall.h"
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
 	int file_count = 0;
 	char **l; /* l[nfile][len] */
 	char new_name[MAX_FILE_LENGTH] = {0};
+	char action = 0;
 
 	if (argc < 2 || strlen(argv[1]) > MAX_PATH)
 		usage(argv[0]);
@@ -45,11 +47,37 @@ int main(int argc, char *argv[])
 		if (get_newname(new_name) != 0)
 			continue;
 
-		if (_rename(l[i], new_name, argv[1]) != 0)
+		switch (_rename(l[i], new_name, argv[1]))
 		{
-			perror("rename");
-			_free(l);
-			exit(-1);
+			case R_SUCCESS:
+				break;
+
+			case R_EXISTS:
+				w_byellow("[!] File already exists. Rename, Skip (r, s) [s] ? ");
+				scanf("%c", &action);
+
+				/* clean stdin' \n */
+				if (action != '\n')
+					purge_stdin();
+
+				switch(lower(action))
+				{
+					case 'r':
+						--i;
+						continue;
+						break;
+
+					case 's':
+					default:
+						continue;
+						break;
+				}
+				break;
+
+				/* rename() error; skip file */
+			default:
+				perror("rename");
+				break;
 		}
 	}
 
@@ -86,7 +114,7 @@ int get_newname(char *new_name)
 	}
 	else
 	{
-		w_byellow("[-] Warning: new name too long; skipping\n");
+		w_byellow("[!] New name too long; skipping\n");
 		purge_stdin();
 		return 1;
 	}
@@ -133,6 +161,9 @@ int _rename(const char *oldname, const char *newname, const char *prefix)
 	strncat(newfile, "/", 1);
 	strncat(newfile, newname, MAX_FILE_LENGTH);
 
+	if (!access(newfile, F_OK))
+		return R_EXISTS;
+
 	return rename(oldfile, newfile);
 }
 
@@ -173,4 +204,11 @@ int list_dir(const char *path, char *l[])
 	closedir(d);
 
 	return i;
+}
+
+char lower(char c)
+{
+	if (c >= 0x41 && c <= 0x5A)
+		return c + 0x20;
+	return c;
 }
