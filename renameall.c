@@ -35,10 +35,12 @@ int main(int argc, char *argv[])
 	_calloc(&l);
 	file_count = list_dir((const char *) argv[1], l);
 	w_bgreen("[+] Found %d file%s\n", file_count, file_count > 1 ? "s\n" : "\n");
+	qsort(l, file_count, sizeof(char *), comp);
 
-	for (i = 0; l[i][0]; i++)
+	for (i = 0; i < file_count; i++)
 	{
-		w_bwhite("'%s': ", l[i]);
+		w_bwhite("'%s'", l[i]);
+		w_bgreen(": ");
 
 		if (get_newname(new_name) != 0)
 			continue;
@@ -92,10 +94,6 @@ int get_newname(char *new_name)
 	return 0;
 }
 
-/*
- * TODO: sort file list
- *
- * */
 int comp(const void *p1, const void *p2)
 {
 	return strcmp(*(char * const *)p1, *(char * const *)p2);
@@ -174,5 +172,5 @@ int list_dir(const char *path, char *l[])
 
 	closedir(d);
 
-	return i+1;
+	return i;
 }
