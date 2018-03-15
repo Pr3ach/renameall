@@ -22,6 +22,6 @@ _clean:
 	rm -rf $(OBJ)
 
 mkdir:
-	mkdir bin
+	mkdir -p bin
 
 .PHONY: clean _clean all
