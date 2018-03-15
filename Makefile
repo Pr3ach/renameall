@@ -4,7 +4,7 @@ SRC=renameall.c color_shell/src/color_shell.c
 OBJ=$(SRC:.c=.o)
 BIN=bin/renameall
 
-all: $(BIN)
+all: mkdir $(BIN)
 
 $(BIN): $(OBJ)
 	$(CC) $^ -o $@ $(FLAGS)
@@ -16,9 +16,12 @@ install: all
 	cp -f $(BIN) /usr/bin
 
 clean:
-	rm -rf $(BIN) $(OBJ)
+	rm -rf $(BIN) $(OBJ) bin
 
 _clean:
 	rm -rf $(OBJ)
+
+mkdir:
+	mkdir bin
 
 .PHONY: clean _clean all
