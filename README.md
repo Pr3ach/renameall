@@ -8,6 +8,6 @@ Installation
 
 Usage
 =====
-	$ renameall <path>
+![Usage](img/usage.jpg)
 
 Simply press `Enter` to skip the current file.
