@@ -8,6 +8,6 @@ Installation
 
 Usage
 =====
-![Usage](img/usage.jpg)
+![Usage](img/usage.png)
 
 Simply press `Enter` to skip the current file.
