@@ -18,7 +18,7 @@
 #ifndef RENAMEALL_H
 #define RENAMEALL_H
 
-#define VERSION 1.0
+#define VERSION 1.01
 #define AUTHOR "Preacher"
 
 #if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__)) || defined(__unix__)

@@ -125,14 +125,14 @@ void usage(const char *self)
 	w_white("  -v			Show version information\n");
 	w_white("  -s<startswith>	Only show files starting with <startswith>\n");
 	w_white("  -e<endswith>		Only show files ending with <endswith>\n");
-	w_white("  -i			Ingore case when -e option is specified\n");
+	w_white("  -i			Ingore case when used with -s or -e\n");
 
 	exit(0);
 }
 
 void version(void)
 {
-	w_bwhite("renameall-%.1f/%s on %s by %s\n", VERSION, PLATFORM, __DATE__, AUTHOR);
+	w_bwhite("renameall-%.2f/%s on %s by %s\n", VERSION, PLATFORM, __DATE__, AUTHOR);
 }
 
 /*
