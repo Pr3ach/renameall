@@ -18,14 +18,35 @@
 #ifndef RENAMEALL_H
 #define RENAMEALL_H
 
+#define VERSION 1.0
+#define AUTHOR "Preacher"
+
+#if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__)) || defined(__unix__)
+#define PLATFORM "unix"
+#else
+#define PLATFORM "win"
+#endif
+
 #define MAX_FILES 1024
 #define MAX_FILE_LENGTH 256
 #define MAX_PATH 256
 
+/* ret val for _rename() */
 #define R_SUCCESS 0
 #define R_EXISTS 1
 
+/* Options mask */
+#define O_NONE 0
+#define O_STARTSWITH 1
+#define O_ENDSWITH 2
+#define O_ICASE 4
+
+int OPTIONS;
+char ENDSWITH[32];
+char STARTSWITH[32];
+
 void usage(const char *self);
+void version(void);
 int get_newname(char *new_name);
 int comp(const void *p1, const void *p2);
 void _calloc(char ***l);
@@ -34,6 +55,8 @@ int _rename(const char *oldname, const char *newname, const char *prefix);
 void purge_stdin(void);
 int list_dir(const char *path, char *l[]);
 char lower(char c);
+int startswith(const char *s, const char *seq, int icase);
+int endswith(const char *s, const char *seq, int icase);
 
 #endif
 

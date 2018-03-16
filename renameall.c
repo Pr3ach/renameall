@@ -30,12 +30,46 @@ int main(int argc, char *argv[])
 	char **l; /* l[nfile][len] */
 	char new_name[MAX_FILE_LENGTH] = {0};
 	char action = 0;
+	int o = 0;
+	char path[MAX_PATH] = {0};
 
-	if (argc < 2 || strlen(argv[1]) > MAX_PATH)
+	if (argc < 2 || strlen(argv[1]) > MAX_PATH-1)
 		usage(argv[0]);
 
+	strncpy(path, argv[1], MAX_PATH-1);
+
+	OPTIONS = O_NONE;
+
+	while ((o = getopt(argc, argv, "e:s:vi")) != -1)
+	{
+		switch((char)o)
+		{
+			case 'v':
+				version();
+				exit(0);
+				break;
+
+			case 'e':
+				OPTIONS |= O_ENDSWITH;
+				strncpy(ENDSWITH, optarg, 30);
+				break;
+
+			case 's':
+				OPTIONS |= O_STARTSWITH;
+				strncpy(STARTSWITH, optarg, 30);
+				break;
+
+			case 'i':
+				OPTIONS |= O_ICASE;
+				break;
+
+			default:
+				break;
+		}
+	}
+
 	_calloc(&l);
-	file_count = list_dir((const char *) argv[1], l);
+	file_count = list_dir((const char *) path, l);
 	w_bgreen("[+] Found %d file%s\n", file_count, file_count > 1 ? "s\n" : "\n");
 	qsort(l, file_count, sizeof(char *), comp);
 
@@ -47,7 +81,7 @@ int main(int argc, char *argv[])
 		if (get_newname(new_name) != 0)
 			continue;
 
-		switch (_rename(l[i], new_name, argv[1]))
+		switch (_rename(l[i], new_name, path))
 		{
 			case R_SUCCESS:
 				break;
@@ -87,9 +121,18 @@ int main(int argc, char *argv[])
 
 void usage(const char *self)
 {
-	w_bwhite("Usage: %s <path>\n", self);
+	w_bwhite("Usage: %s <path> [OPTIONS]\n", self);
+	w_white("  -v			Show version information\n");
+	w_white("  -s<startswith>	Only show files starting with <startswith>\n");
+	w_white("  -e<endswith>		Only show files ending with <endswith>\n");
+	w_white("  -i			Ingore case when -e option is specified\n");
 
 	exit(0);
+}
+
+void version(void)
+{
+	w_bwhite("renameall-%.1f/%s on %s by %s\n", VERSION, PLATFORM, __DATE__, AUTHOR);
 }
 
 /*
@@ -196,10 +239,32 @@ int list_dir(const char *path, char *l[])
 		exit(-1);
 	}
 
-	/* Skip '.' & '..' */
 	while((dir = readdir(d)))
-		if (strcmp(dir->d_name, ".") && strcmp(dir->d_name, ".."))
+	{
+		/* Skip '.' & '..' */
+		if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, ".."))
+			continue;
+
+		if ((OPTIONS & O_STARTSWITH) && (OPTIONS & O_ENDSWITH))
+		{
+			if (!startswith(dir->d_name, STARTSWITH, OPTIONS & O_ICASE) && !endswith(dir->d_name, ENDSWITH, OPTIONS & O_ICASE))
+				strncpy(l[i++], dir->d_name, dir->d_reclen+1);
+		}
+		else if (OPTIONS & O_STARTSWITH)
+		{
+			if (!startswith(dir->d_name, STARTSWITH, OPTIONS & O_ICASE))
+				strncpy(l[i++], dir->d_name, dir->d_reclen+1);
+		}
+		else if (OPTIONS & O_ENDSWITH)
+		{
+			if (!endswith(dir->d_name, ENDSWITH, OPTIONS & O_ICASE))
+				strncpy(l[i++], dir->d_name, dir->d_reclen+1);
+		}
+		else
+		{
 			strncpy(l[i++], dir->d_name, dir->d_reclen+1);
+		}
+	}
 
 	closedir(d);
 
@@ -211,4 +276,23 @@ char lower(char c)
 	if (c >= 0x41 && c <= 0x5A)
 		return c + 0x20;
 	return c;
+}
+
+int startswith(const char *s, const char *seq, int icase)
+{
+	if (icase)
+		return strncasecmp(s, seq, strlen(seq));
+	else
+		return strncmp(s, seq, strlen(seq));
+}
+
+int endswith(const char *s, const char *seq, int icase)
+{
+	if (strlen(seq) > strlen(s))
+		return -1;
+
+	if (icase)
+		return strcasecmp(s+strlen(s)-strlen(seq), seq);
+	else
+		return strcmp(s+strlen(s)-strlen(seq), seq);
 }
